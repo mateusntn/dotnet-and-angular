@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using ProEventos.API.Data;
 using ProEventos.API.Models;
 
 namespace ProEventos.API.Controllers;
@@ -7,21 +8,23 @@ namespace ProEventos.API.Controllers;
 [Route("[controller]")]
 public class EventController : ControllerBase
 {
-    public EventController()
+    private readonly DataContext _context;
+    public EventController(DataContext context)
     {
+        this._context = context;
     }
 
     [HttpGet(Name = "GetEvent")]
-    public Event Get()
+    public IEnumerable<Event> Get()
+    {        
+        return _context.Events;
+    }
+
+    [HttpPost(Name = "CreateEvent")]
+    public Event Create(Event dto) 
     {
-        return new Event() {
-            Id = 1,
-            Title = ".NET 5",
-            Local = "Udemy",
-            Date = DateTime.Now.AddMonths(1),
-            Lot = "Firs Lot",
-            AmountPeople = 100,
-            UrlImage = "https://www.udemy.com/staticx/udemy/images/v7/logo-udemy.svg"
-        };
+        _context.Events.Add(dto);
+        _context.SaveChanges();
+        return dto;
     }
 }
